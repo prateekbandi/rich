@@ -71,6 +71,35 @@ def test_render():
     assert render() == expected
 
 
+def test_fixed_width_does_not_divide_by_zero_when_too_narrow():
+    file_names = [f"file_{i:02d}.txt" for i in range(8)]
+    console = Console(
+        file=io.StringIO(),
+        width=16,
+        height=24,
+        force_terminal=True,
+        color_system=None,
+        highlight=False,
+    )
+    console.print(Columns(file_names, width=16))
+
+    output = console.file.getvalue()
+    for file_name in file_names:
+        assert file_name in output
+
+
+def test_zero_width_does_not_divide_by_zero():
+    console = Console(
+        file=io.StringIO(),
+        width=20,
+        force_terminal=True,
+        color_system=None,
+        highlight=False,
+    )
+    console.print(Columns(["alpha", "beta"], width=0, padding=0))
+    assert console.file.getvalue() == "\u2026\n\u2026\n"
+
+
 if __name__ == "__main__":
     result = render()
     print(result)
